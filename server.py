@@ -4,56 +4,55 @@ from random import *
 import pickle
 from tabulate import tabulate
 
-port = 12000 #Don Carlos and Wael
-server = socket(AF_INET, SOCK_STREAM)  # Creating socket #Don Carlos and Wael
-server.bind((gethostname(), port))#Don Carlos and Wael
-server.listen(100)#Don Carlos and Wael
-print("Ready to recieve")#Don Carlos and Wael
-print("Waiting for players to join")#Don Carlos and Wael
-clients = []  # List to store all client connections #Don Carlos and Wael
+port = 12000 
+server = socket(AF_INET, SOCK_STREAM)  # Creating socket 
+server.bind((gethostname(), port))
+server.listen(100)
+print("Ready to recieve")
+print("Waiting for players to join")
+clients = []  # List to store all client connections 
 
-server.settimeout(10)  # 10 seconds for all players to join #Don Carlos and Wael
-count = 1 #Don Carlos and Wael
+server.settimeout(10)  # 10 seconds for all players to join 
+count = 1 
 
 try:
     while True:
-        client, add = server.accept()  # Accepting connections #Don Carlos and Wael
+        client, add = server.accept()  # Accepting connections 
         client.settimeout(5)  # This means that if a response is not received within a certain amount of time ( 5 seconds) , the socket will give up waiting and raise an exception.
-        # Don Carlos and Wael
-        clients.append(client)  # Appending the new client to our list #Don Carlos and Wael
-        client.send(f"Welcome, you are player {count}!".encode()) #Don Carlos and Wael
-        print(f"Connection Established with player {count} from address {add}") #Don Carlos and Wael
-        count += 1  # incrementing the number of players #Don Carlos and Wael
+        clients.append(client)  # Appending the new client to our list 
+        client.send(f"Welcome, you are player {count}!".encode()) 
+        print(f"Connection Established with player {count} from address {add}") 
+        count += 1  # incrementing the number of players 
 except:
-    print(f"Number of players: {count - 1}")  # Timeout has occured, server has stopped accepting new players #Wael
-    server.close()#Wael
+    print(f"Number of players: {count - 1}")  # Timeout has occured, server has stopped accepting new players 
+    server.close()
 
-numofplayers = count - 1 #Jennifer and Charbel
+numofplayers = count - 1 
 
-columns1 = ["Players", "Cumulative Scores"]  # for printing the tables #Jennifer and Charbel
-columns2 = ["Players", "Final Scores"] #Jennifer and Charbel
+columns1 = ["Players", "Cumulative Scores"]  # for printing the tables 
+columns2 = ["Players", "Final Scores"] 
 
 while True:
-    cumu = []  # List of cumulative scores, to be filled #Jennifer and Charbel
-    discon = ['quit']  # This is used later to tell other players if a player has disconnected or not #Jennifer and Charbel
+    cumu = []  # List of cumulative scores, to be filled 
+    discon = ['quit']  # This is used later to tell other players if a player has disconnected or not 
 
-    if numofplayers == 0:  # if no players join the game #Jennifer and Charbel
-        break #Jennifer and Charbel
+    if numofplayers == 0:  # if no players join the game 
+        break 
 
-    for i in range(0, numofplayers): #Jennifer and Charbel
-        cumu.append([i + 1, 0])  # Initializing cumulative score array to 0's #Jennifer and Charbel
+    for i in range(0, numofplayers): 
+        cumu.append([i + 1, 0])  # Initializing cumulative score array to 0's 
     for i in range(3):
-        bools = False; #Don Carlos and Wael
-        disc = -1 #Don Carlos and Wael
-        x = randint(0, 9)  # Generating random number between 0 and 9 inclusive #All
-        temp = [] #Don Carlos and Wael
+        bools = False; 
+        disc = -1 
+        x = randint(0, 9)  # Generating random number between 0 and 9 inclusive 
+        temp = [] 
 
-        for j in range(1, numofplayers + 1): #Jennifer and Charbel
-            temp.append([j, float('inf')])  # Initializing temp array to keep track of current round scores #Jennifer and Charbel
+        for j in range(1, numofplayers + 1): 
+            temp.append([j, float('inf')])  # Initializing temp array to keep track of current round scores
         player = 0
-        for client in clients: #Jennifer and Charbel
-            sleep(0.5) #Jennifer and Charbel
-            st = time()  # Time of sending number #Jennifer and Charbel
+        for client in clients: 
+            sleep(0.5) 
+            st = time()  # Time of sending number 
             #Lines 58-> 67: Don Carlos
             try:
                 client.send(str(x).encode())  # Try to send number to client
@@ -65,8 +64,7 @@ while True:
             except:
                 bools = True;
                 discon.append(player + 1)
-            end = time() #Jennifer and Charbel
-            #Lines 70->80: Wael
+            end = time()
             if not bools:
                 if (str(ans) == str(x)):
                     temp[player][1] = end - st  # if no disconnection, compare player's answer to the number sent, if they match, find the rtt and store it int the temp array
@@ -85,27 +83,27 @@ while True:
                 # then the player should get an increment of his score, which we decided to be the number of players - (his position in the current round-1)
                 cumu[temp[j][0] - 1][1] += (numofplayers - j)  # here we add each score to the cumulative score array
 
-        res = []#Don Carlos and Wael
-        a = numofplayers #Don Carlos and Wael
-        for j in range(len(temp)): #Don Carlos and Wael
-            if temp[j][1] == float('inf'): #Don Carlos and Wael
+        res = []
+        a = numofplayers 
+        for j in range(len(temp)): 
+            if temp[j][1] == float('inf'): 
                 a = j
                 break
-            res.append([str(j + 1) + ") Player " + str(temp[j][0])]) #Don Carlos and Wael
+            res.append([str(j + 1) + ") Player " + str(temp[j][0])]) 
         if a != numofplayers:
-            temp2 = ["Wrong answers:"] #Jennifer and Charbel
+            temp2 = ["Wrong answers:"]
             for j in range(a, numofplayers):
                 if j != numofplayers - 1:
-                    temp2.append("Player " + str(temp[j][0]) + ',') #Jennifer and Charbel
+                    temp2.append("Player " + str(temp[j][0]) + ',')
                 else:
-                    temp2.append("Player " + str(temp[j][0])) #Jennifer and Charbel
+                    temp2.append("Player " + str(temp[j][0]))
             # Lines 81 to 94 check the players that have entered a wrong number to declare that later on
             res.append(temp2)
-        print("\nROUND " + str(i + 1) + ': ') #Jennifer and Charbel
+        print("\nROUND " + str(i + 1) + ': ')
         for x in res:
-            print(*x) #Don Carlos and Wael
+            print(*x) 
         for a in clients:
-            a.send(pickle.dumps(res)) #Don Carlos and Wael
+            a.send(pickle.dumps(res)) 
         # sending results of each round to the players
         cumu.sort(key=lambda x: x[1], reverse=True)  # sorting cumulative score array #Everyone contributed from 110-> 119
         sleep(0.1)
@@ -119,7 +117,7 @@ while True:
         cumu.sort(key=lambda x: x[0], reverse=False)  # return to initial state to fill up later on
     # in the following lines we print the final scores
 
-    if not bools and numofplayers != 0: #Ideas from 122-> 140 by Jennifer and Charbel, implementation by Don Carlos and Wael.
+    if not bools and numofplayers != 0:
         cumu.sort(key=lambda x: x[1], reverse=True)
         print(tabulate(cumu, headers=columns2, tablefmt="fancy_grid"))
         maxi = cumu[0][1]
@@ -138,12 +136,6 @@ while True:
             print("Player " + str(tie[0]) + " won ! ")
         # the above chunk of code is to determine whether we have a tie or not.
     break
-
-# Charbel and Jennifer contributed to the format/layout of the game and what should happens if
-# specific situations happen game wise (score distribution, disconnection,...)
-
-# Don Carlos and Wael contributed to designing the communication between the server and clients and error
-# handling from both hides
 
 # Design: tabulation, layout of text (display format...)
 # Communication: error handling, sending and receiving protocols,timeouts...
