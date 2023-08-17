@@ -52,8 +52,7 @@ while True:
         player = 0
         for client in clients: 
             sleep(0.5) 
-            st = time()  # Time of sending number 
-            #Lines 58-> 67: Don Carlos
+            st = time()  # Time of sending number
             try:
                 client.send(str(x).encode())  # Try to send number to client
             except:
