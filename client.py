@@ -42,13 +42,12 @@ for i in range(3):
         else:
             print(
                 f"Game Over, Player {res[0]} has disconnected!")  # else only one player has disconnected, print that player, in the case above, multiple have disconnected
-            #Wael and Don Carlos
         break
     c = client.recv(4096)  # this receive is for the cumulative scores
     cumu = pickle.loads(c) 
     print("\nROUND " + str(i + 1) + ': ') 
     for x in res:
-        print(*x) #Don Carlos
+        print(*x)
     if i != 2:
         print(tabulate(cumu, headers=columns1, tablefmt="fancy_grid"))
         print()
